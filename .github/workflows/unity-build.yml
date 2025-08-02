@@ -1,0 +1,33 @@
+name: Unity Build
+
+on:
+  push:
+    branches: [ main ]  # Запуск при пуше в main
+  pull_request:
+    branches: [ main ]  # И при пулл-реквестах
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Используем Ubuntu (бесплатный вариант)
+    
+    steps:
+    # Шаг 1: Загрузка кода репозитория
+    - uses: actions/checkout@v4
+    
+    # Шаг 2: Кэширование Library для ускорения
+    - uses: actions/cache@v3
+      with:
+        path: Library
+        key: Library-${{ hashFiles('ProjectSettings/ProjectVersion.txt') }}
+    
+    # Шаг 3: Сборка проекта через Unity Builder
+    - uses: game-ci/unity-builder@v3
+      with:
+        unityVersion: 2022.3.11f1  # Укажите вашу версию Unity
+        targetPlatform: WebGL       # Платформа (Windows, Android, iOS и т.д.)
+    
+    # Шаг 4: Сохранение билда как артефакта
+    - uses: actions/upload-artifact@v3
+      with:
+        name: WebGL-Build
+        path: build/WebGL
